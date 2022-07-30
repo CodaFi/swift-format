@@ -34,7 +34,9 @@ public final class ReturnVoidInsteadOfEmptyTuple: SyntaxFormatRule {
     // If the user has put non-whitespace trivia inside the empty tuple, like a comment, then we
     // still diagnose it as a lint error but we don't replace it because it's not obvious where the
     // comment should go.
-    if hasNonWhitespaceLeadingTrivia(returnType.rightParen) {
+    if hasNonWhitespaceTrivia(returnType.leftParen, at: .trailing)
+        || hasNonWhitespaceTrivia(returnType.rightParen, at: .leading)
+    {
       return super.visit(node)
     }
 
@@ -58,7 +60,8 @@ public final class ReturnVoidInsteadOfEmptyTuple: SyntaxFormatRule {
     // If the user has put non-whitespace trivia inside the empty tuple, like a comment, then we
     // still diagnose it as a lint error but we don't replace it because it's not obvious where the
     // comment should go.
-    if hasNonWhitespaceLeadingTrivia(returnType.rightParen) {
+    if hasNonWhitespaceTrivia(returnType.leftParen, at: .trailing)
+        || hasNonWhitespaceTrivia(returnType.rightParen, at: .leading) {
       return super.visit(node)
     }
 
@@ -79,8 +82,8 @@ public final class ReturnVoidInsteadOfEmptyTuple: SyntaxFormatRule {
 
   /// Returns a value indicating whether the leading trivia of the given token contained any
   /// non-whitespace pieces.
-  private func hasNonWhitespaceLeadingTrivia(_ token: TokenSyntax) -> Bool {
-    for piece in token.leadingTrivia {
+  private func hasNonWhitespaceTrivia(_ token: TokenSyntax, at position: TriviaPosition) -> Bool {
+    for piece in position == .leading ? token.leadingTrivia : token.trailingTrivia {
       switch piece {
       case .blockComment, .docBlockComment, .docLineComment, .unexpectedText, .lineComment,
         .shebang:
@@ -90,6 +93,11 @@ public final class ReturnVoidInsteadOfEmptyTuple: SyntaxFormatRule {
       }
     }
     return false
+  }
+
+  private func hasUnexpectedChildren<Node: SyntaxProtocol>(_ node: Node) -> Bool {
+    return node.children(viewMode: .sourceAccurate)
+      .contains(where: { $0.is(UnexpectedNodesSyntax.self) })
   }
 
   /// Returns a type syntax node with the identifier `Void` whose leading and trailing trivia have

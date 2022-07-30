@@ -244,7 +244,7 @@ final class FunctionDeclTests: PrettyPrintTestCase {
     assertPrettyPrintEqual(input: input, expected: expected, linelength: 40, configuration: config)
   }
 
-  func testFunctionGenericParameters_packArguments() {
+  func testFunctionGenericParameters_packArguments() throws {
     let input =
       """
       func myFun<S, T>(var1: S, var2: T) {

@@ -16,7 +16,8 @@ import SwiftFormatCore
 import SwiftFormatPrettyPrint
 import SwiftFormatRules
 import SwiftSyntax
-import SwiftSyntaxParser
+import SwiftParser
+import SwiftDiagnostics
 
 /// Formats Swift source code or syntax trees according to the Swift style guidelines.
 public final class SwiftFormatter {
@@ -64,8 +65,8 @@ public final class SwiftFormatter {
     if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
       throw SwiftFormatError.isDirectory
     }
-    let sourceFile = try SyntaxParser.parse(url, diagnosticHandler: parsingDiagnosticHandler)
     let source = try String(contentsOf: url, encoding: .utf8)
+    let sourceFile = try Parser.parse(source: source)
     try format(syntax: sourceFile, assumingFileURL: url, source: source, to: &outputStream)
   }
 
@@ -84,11 +85,9 @@ public final class SwiftFormatter {
   public func format<Output: TextOutputStream>(
     source: String,
     assumingFileURL url: URL?,
-    to outputStream: inout Output,
-    parsingDiagnosticHandler: ((Diagnostic) -> Void)? = nil
+    to outputStream: inout Output
   ) throws {
-    let sourceFile =
-      try SyntaxParser.parse(source: source, diagnosticHandler: parsingDiagnosticHandler)
+    let sourceFile = try Parser.parse(source: source)
     try format(syntax: sourceFile, assumingFileURL: url, source: source, to: &outputStream)
   }
 

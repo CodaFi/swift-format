@@ -146,10 +146,14 @@ enum NewlineBehavior {
   case hard(count: Int)
 
   /// An elective newline that respects discretionary newlines from the user-entered text.
-  static let elective = NewlineBehavior.elective(ignoresDiscretionary: false)
+  static var elective: NewlineBehavior {
+    NewlineBehavior.elective(ignoresDiscretionary: false)
+  }
 
   /// A single soft newline that is created by the formatter, i.e. *not* discretionary.
-  static let soft = NewlineBehavior.soft(count: 1, discretionary: false)
+  static var soft: NewlineBehavior {
+    NewlineBehavior.soft(count: 1, discretionary: false)
+  }
 
   /// A single hard newline.
   static let hard = NewlineBehavior.hard(count: 1)

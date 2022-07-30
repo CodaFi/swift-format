@@ -44,6 +44,19 @@ public final class NeverForceUnwrap: SyntaxLintRule {
     diagnose(.doNotForceCast(name: node.typeName.withoutTrivia().description), on: node)
     return .skipChildren
   }
+
+  public override func visit(_ node: SequenceExprSyntax) -> SyntaxVisitorContinueKind {
+    // Only fire if we're not in a test file and if there is an exclamation mark following the `as`
+    // keyword.
+    guard node.elements.count >= 3 else { return .skipChildren }
+    guard context.importsXCTest == .doesNotImportXCTest else { return .skipChildren }
+    guard let asExpr = node.elements.dropFirst().first?.as(UnresolvedAsExprSyntax.self) else { return .skipChildren }
+    guard let typeExpr = node.elements.dropFirst().dropFirst().first?.as(TypeExprSyntax.self) else { return .skipChildren }
+    guard let questionOrExclamation = asExpr.questionOrExclamationMark else { return .skipChildren }
+    guard questionOrExclamation.tokenKind == .exclamationMark else { return .skipChildren }
+    diagnose(.doNotForceCast(name: typeExpr.withoutTrivia().description), on: node)
+    return .skipChildren
+  }
 }
 
 extension Finding.Message {

@@ -1,3 +1,5 @@
+import XCTest
+
 final class TypeAliasTests: PrettyPrintTestCase {
   func testTypealias() {
     let input =

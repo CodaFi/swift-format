@@ -32,8 +32,7 @@ class LintFrontend: Frontend {
     do {
       try linter.lint(
         source: source,
-        assumingFileURL: url,
-        parsingDiagnosticHandler: diagnosticsEngine.consumeParserDiagnostic)
+        assumingFileURL: url)
     } catch SwiftFormatError.fileNotReadable {
       diagnosticsEngine.emitError(
         "Unable to lint \(url.relativePath): file is not readable or does not exist.")

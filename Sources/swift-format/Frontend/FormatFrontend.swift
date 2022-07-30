@@ -46,8 +46,7 @@ class FormatFrontend: Frontend {
         try formatter.format(
           source: source,
           assumingFileURL: url,
-          to: &buffer,
-          parsingDiagnosticHandler: diagnosticsEngine.consumeParserDiagnostic)
+          to: &buffer)
 
         if buffer != source {
           let bufferData = buffer.data(using: .utf8)!  // Conversion to UTF-8 cannot fail
@@ -57,8 +56,7 @@ class FormatFrontend: Frontend {
         try formatter.format(
           source: source,
           assumingFileURL: url,
-          to: &stdoutStream,
-          parsingDiagnosticHandler: diagnosticsEngine.consumeParserDiagnostic)
+          to: &stdoutStream)
       }
     } catch SwiftFormatError.fileNotReadable {
       diagnosticsEngine.emitError(
